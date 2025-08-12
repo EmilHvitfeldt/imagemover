@@ -1,0 +1,36 @@
+---
+title: "Imagemover Example"
+format:
+  revealjs: default
+revealjs-plugins:
+  - imagemover
+---
+
+# In the morning
+
+::: {#filename filename=example.qmd}
+:::
+
+![](image.png){#imagemover}
+
+## Getting up
+
+- Turn off alarm
+- Get out of bed
+
+## Breakfast
+
+- Eat eggs
+- Drink coffee
+
+# In the evening
+
+## Dinner
+
+- Eat spaghetti
+- Drink wine
+
+## Going to sleep
+
+- Get in bed
+- Count sheep
