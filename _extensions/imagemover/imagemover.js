@@ -60,8 +60,8 @@ function setupDraggableImage(img) {
   function setupImageStyles(img) {
     img.style.cursor = 'move';
     img.style.position = 'relative';
-    img.style.width = (img.naturalWidth || img.offsetWidth) + 'px';
-    img.style.height = (img.naturalHeight || img.offsetHeight) + 'px';
+    img.style.width = (img.naturalWidth || img.offsetWidth) / 2 + 'px';
+    img.style.height = (img.naturalHeight || img.offsetHeight) / 2 + 'px';
     img.style.display = 'block';
   }
 
