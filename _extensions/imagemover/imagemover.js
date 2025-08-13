@@ -5,203 +5,7 @@ window.RevealImagemover = function () {
       document.addEventListener('DOMContentLoaded', function () {
         const imagemoverImages = document.querySelectorAll('img[id="imagemover"]');
 
-        imagemoverImages.forEach(img => {
-          let isDragging = false;
-          let isResizing = false;
-          let startX, startY, initialX, initialY, initialWidth, initialHeight;
-          let resizeHandle = null;
-
-          // Wrap image in a container
-          const container = document.createElement('div');
-          container.style.position = 'absolute';
-          container.style.display = 'inline-block';
-          container.style.border = '2px solid transparent';
-          img.parentNode.insertBefore(container, img);
-          container.appendChild(img);
-
-          // Make image draggable
-          img.style.cursor = 'move';
-          img.style.position = 'relative';
-          img.style.width = (img.naturalWidth || img.offsetWidth) + 'px';
-          img.style.height = (img.naturalHeight || img.offsetHeight) + 'px';
-          img.style.display = 'block';
-
-          // Create resize handles
-          const handles = ['nw', 'ne', 'sw', 'se'];
-          handles.forEach(position => {
-            const handle = document.createElement('div');
-            handle.className = 'resize-handle';
-            handle.style.position = 'absolute';
-            handle.style.width = '10px';
-            handle.style.height = '10px';
-            handle.style.backgroundColor = '#007cba';
-            handle.style.border = '1px solid #fff';
-            handle.style.cursor = position + '-resize';
-            handle.style.opacity = '0';
-            handle.style.transition = 'opacity 0.2s';
-
-            // Position handles
-            if (position.includes('n')) handle.style.top = '-6px';
-            if (position.includes('s')) handle.style.bottom = '-6px';
-            if (position.includes('w')) handle.style.left = '-6px';
-            if (position.includes('e')) handle.style.right = '-6px';
-
-            handle.dataset.position = position;
-            container.appendChild(handle);
-          });
-
-          // Show/hide handles on hover
-          container.addEventListener('mouseenter', () => {
-            container.style.border = '2px solid #007cba';
-            container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '1');
-          });
-
-          container.addEventListener('mouseleave', () => {
-            if (!isDragging && !isResizing) {
-              container.style.border = '2px solid transparent';
-              container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '0');
-            }
-          });
-
-          // Mouse events for dragging
-          img.addEventListener('mousedown', startDrag);
-
-          // Mouse events for resizing
-          container.querySelectorAll('.resize-handle').forEach(handle => {
-            handle.addEventListener('mousedown', startResize);
-          });
-
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', stopAction);
-
-          // Touch events
-          img.addEventListener('touchstart', startDrag);
-          container.querySelectorAll('.resize-handle').forEach(handle => {
-            handle.addEventListener('touchstart', startResize);
-          });
-          document.addEventListener('touchmove', handleTouchMove);
-          document.addEventListener('touchend', stopAction);
-
-          function startDrag(e) {
-            if (e.target.classList.contains('resize-handle')) return;
-
-            isDragging = true;
-
-            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-            startX = clientX;
-            startY = clientY;
-            initialX = container.offsetLeft;
-            initialY = container.offsetTop;
-
-            e.preventDefault();
-          }
-
-          function startResize(e) {
-            isResizing = true;
-            resizeHandle = e.target.dataset.position;
-
-            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-            startX = clientX;
-            startY = clientY;
-            initialWidth = img.offsetWidth;
-            initialHeight = img.offsetHeight;
-            initialX = container.offsetLeft;
-            initialY = container.offsetTop;
-
-            e.preventDefault();
-            e.stopPropagation();
-          }
-
-          function handleMouseMove(e) {
-            if (isDragging) {
-              drag(e);
-            } else if (isResizing) {
-              resize(e);
-            }
-          }
-
-          function handleTouchMove(e) {
-            if (isDragging) {
-              drag(e);
-            } else if (isResizing) {
-              resize(e);
-            }
-          }
-
-          function drag(e) {
-            if (!isDragging) return;
-
-            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-            const deltaX = clientX - startX;
-            const deltaY = clientY - startY;
-
-            container.style.left = (initialX + deltaX) + 'px';
-            container.style.top = (initialY + deltaY) + 'px';
-
-            e.preventDefault();
-          }
-
-          function resize(e) {
-            if (!isResizing) return;
-
-            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-            const deltaX = clientX - startX;
-            const deltaY = clientY - startY;
-
-            let newWidth = initialWidth;
-            let newHeight = initialHeight;
-            let newX = initialX;
-            let newY = initialY;
-
-            // Calculate new dimensions based on handle position
-            if (resizeHandle.includes('e')) {
-              newWidth = Math.max(50, initialWidth + deltaX);
-            }
-            if (resizeHandle.includes('w')) {
-              newWidth = Math.max(50, initialWidth - deltaX);
-              newX = initialX + (initialWidth - newWidth);
-            }
-            if (resizeHandle.includes('s')) {
-              newHeight = Math.max(50, initialHeight + deltaY);
-            }
-            if (resizeHandle.includes('n')) {
-              newHeight = Math.max(50, initialHeight - deltaY);
-              newY = initialY + (initialHeight - newHeight);
-            }
-
-            // Apply new dimensions
-            img.style.width = newWidth + 'px';
-            img.style.height = newHeight + 'px';
-            container.style.left = newX + 'px';
-            container.style.top = newY + 'px';
-
-            e.preventDefault();
-          }
-
-          function stopAction() {
-            if (isDragging || isResizing) {
-              // Keep handles visible briefly after action
-              setTimeout(() => {
-                if (!container.matches(':hover')) {
-                  container.style.border = '2px solid transparent';
-                  container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '0');
-                }
-              }, 500);
-            }
-
-            isDragging = false;
-            isResizing = false;
-            resizeHandle = null;
-          }
-        });
+        imagemoverImages.forEach(setupDraggableImage);
 
         // Find the slide-menu-items ul inside menu-custom-panel div
         const slideMenuItems = document.querySelector('div.slide-menu-custom-panel ul.slide-menu-items');
@@ -217,8 +21,6 @@ window.RevealImagemover = function () {
             }
           });
 
-
-
           // Create the new li element
           const newLi = document.createElement('li');
           newLi.className = 'slide-tool-item';
@@ -232,6 +34,208 @@ window.RevealImagemover = function () {
     },
   };
 };
+
+function setupDraggableImage(img) {
+  let isDragging = false;
+  let isResizing = false;
+  let startX, startY, initialX, initialY, initialWidth, initialHeight;
+  let resizeHandle = null;
+
+  const container = createImageContainer(img);
+  setupImageStyles(img);
+  createResizeHandles(container);
+  setupHoverEffects(container, () => isDragging, () => isResizing);
+  attachEventListeners();
+
+  function createImageContainer(img) {
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.display = 'inline-block';
+    container.style.border = '2px solid transparent';
+    img.parentNode.insertBefore(container, img);
+    container.appendChild(img);
+    return container;
+  }
+
+  function setupImageStyles(img) {
+    img.style.cursor = 'move';
+    img.style.position = 'relative';
+    img.style.width = (img.naturalWidth || img.offsetWidth) + 'px';
+    img.style.height = (img.naturalHeight || img.offsetHeight) + 'px';
+    img.style.display = 'block';
+  }
+
+  function createResizeHandles(container) {
+    const handles = ['nw', 'ne', 'sw', 'se'];
+    handles.forEach(position => {
+      const handle = document.createElement('div');
+      handle.className = 'resize-handle';
+      handle.style.position = 'absolute';
+      handle.style.width = '10px';
+      handle.style.height = '10px';
+      handle.style.backgroundColor = '#007cba';
+      handle.style.border = '1px solid #fff';
+      handle.style.cursor = position + '-resize';
+      handle.style.opacity = '0';
+      handle.style.transition = 'opacity 0.2s';
+
+      if (position.includes('n')) handle.style.top = '-6px';
+      if (position.includes('s')) handle.style.bottom = '-6px';
+      if (position.includes('w')) handle.style.left = '-6px';
+      if (position.includes('e')) handle.style.right = '-6px';
+
+      handle.dataset.position = position;
+      container.appendChild(handle);
+    });
+  }
+
+  function setupHoverEffects(container, isDraggingFn, isResizingFn) {
+    container.addEventListener('mouseenter', () => {
+      container.style.border = '2px solid #007cba';
+      container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '1');
+    });
+
+    container.addEventListener('mouseleave', () => {
+      if (!isDraggingFn() && !isResizingFn()) {
+        container.style.border = '2px solid transparent';
+        container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '0');
+      }
+    });
+  }
+
+  function attachEventListeners() {
+    img.addEventListener('mousedown', startDrag);
+    img.addEventListener('touchstart', startDrag);
+
+    container.querySelectorAll('.resize-handle').forEach(handle => {
+      handle.addEventListener('mousedown', startResize);
+      handle.addEventListener('touchstart', startResize);
+    });
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', stopAction);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', stopAction);
+  }
+
+  function getClientCoordinates(e) {
+    const isTouch = e.type.startsWith('touch');
+    return {
+      clientX: isTouch ? e.touches[0].clientX : e.clientX,
+      clientY: isTouch ? e.touches[0].clientY : e.clientY
+    };
+  }
+
+  function startDrag(e) {
+    if (e.target.classList.contains('resize-handle')) return;
+
+    isDragging = true;
+    const { clientX, clientY } = getClientCoordinates(e);
+
+    startX = clientX;
+    startY = clientY;
+    initialX = container.offsetLeft;
+    initialY = container.offsetTop;
+
+    e.preventDefault();
+  }
+
+  function startResize(e) {
+    isResizing = true;
+    resizeHandle = e.target.dataset.position;
+
+    const { clientX, clientY } = getClientCoordinates(e);
+
+    startX = clientX;
+    startY = clientY;
+    initialWidth = img.offsetWidth;
+    initialHeight = img.offsetHeight;
+    initialX = container.offsetLeft;
+    initialY = container.offsetTop;
+
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function handleMouseMove(e) {
+    if (isDragging) {
+      drag(e);
+    } else if (isResizing) {
+      resize(e);
+    }
+  }
+
+  function handleTouchMove(e) {
+    if (isDragging) {
+      drag(e);
+    } else if (isResizing) {
+      resize(e);
+    }
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+
+    const { clientX, clientY } = getClientCoordinates(e);
+    const deltaX = clientX - startX;
+    const deltaY = clientY - startY;
+
+    container.style.left = (initialX + deltaX) + 'px';
+    container.style.top = (initialY + deltaY) + 'px';
+
+    e.preventDefault();
+  }
+
+  function resize(e) {
+    if (!isResizing) return;
+
+    const { clientX, clientY } = getClientCoordinates(e);
+    const deltaX = clientX - startX;
+    const deltaY = clientY - startY;
+
+    let newWidth = initialWidth;
+    let newHeight = initialHeight;
+    let newX = initialX;
+    let newY = initialY;
+
+    if (resizeHandle.includes('e')) {
+      newWidth = Math.max(50, initialWidth + deltaX);
+    }
+    if (resizeHandle.includes('w')) {
+      newWidth = Math.max(50, initialWidth - deltaX);
+      newX = initialX + (initialWidth - newWidth);
+    }
+    if (resizeHandle.includes('s')) {
+      newHeight = Math.max(50, initialHeight + deltaY);
+    }
+    if (resizeHandle.includes('n')) {
+      newHeight = Math.max(50, initialHeight - deltaY);
+      newY = initialY + (initialHeight - newHeight);
+    }
+
+    img.style.width = newWidth + 'px';
+    img.style.height = newHeight + 'px';
+    container.style.left = newX + 'px';
+    container.style.top = newY + 'px';
+
+    e.preventDefault();
+  }
+
+  function stopAction() {
+    if (isDragging || isResizing) {
+      setTimeout(() => {
+        if (!container.matches(':hover')) {
+          container.style.border = '2px solid transparent';
+          container.querySelectorAll('.resize-handle').forEach(h => h.style.opacity = '0');
+        }
+      }, 500);
+    }
+
+    isDragging = false;
+    isResizing = false;
+    resizeHandle = null;
+  }
+}
 
 async function saveMovedImages() {
   index = await readIndexQmd()
