@@ -43,7 +43,7 @@ Once you are happy with the sizes, open the menu (M), go to tools, and click "Sa
 
 ## Demo Video
 
-![](demo.mp4)
+![](demo.gif)
 
 ## Example
 
