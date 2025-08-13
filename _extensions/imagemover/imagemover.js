@@ -198,19 +198,45 @@ function setupDraggableImage(img) {
     let newX = initialX;
     let newY = initialY;
 
-    if (resizeHandle.includes('e')) {
-      newWidth = Math.max(50, initialWidth + deltaX);
-    }
-    if (resizeHandle.includes('w')) {
-      newWidth = Math.max(50, initialWidth - deltaX);
-      newX = initialX + (initialWidth - newWidth);
-    }
-    if (resizeHandle.includes('s')) {
-      newHeight = Math.max(50, initialHeight + deltaY);
-    }
-    if (resizeHandle.includes('n')) {
-      newHeight = Math.max(50, initialHeight - deltaY);
-      newY = initialY + (initialHeight - newHeight);
+    // Check if Shift key is pressed for aspect ratio preservation
+    const preserveAspectRatio = e.shiftKey;
+    const aspectRatio = initialWidth / initialHeight;
+
+    if (preserveAspectRatio) {
+      // For corner handles, use the larger delta to maintain aspect ratio
+      if (resizeHandle.includes('e') || resizeHandle.includes('w')) {
+        const widthChange = resizeHandle.includes('e') ? deltaX : -deltaX;
+        newWidth = Math.max(50, initialWidth + widthChange);
+        newHeight = newWidth / aspectRatio;
+      } else if (resizeHandle.includes('s') || resizeHandle.includes('n')) {
+        const heightChange = resizeHandle.includes('s') ? deltaY : -deltaY;
+        newHeight = Math.max(50, initialHeight + heightChange);
+        newWidth = newHeight * aspectRatio;
+      }
+
+      // Adjust position for west/north handles when preserving aspect ratio
+      if (resizeHandle.includes('w')) {
+        newX = initialX + (initialWidth - newWidth);
+      }
+      if (resizeHandle.includes('n')) {
+        newY = initialY + (initialHeight - newHeight);
+      }
+    } else {
+      // Original free resize behavior
+      if (resizeHandle.includes('e')) {
+        newWidth = Math.max(50, initialWidth + deltaX);
+      }
+      if (resizeHandle.includes('w')) {
+        newWidth = Math.max(50, initialWidth - deltaX);
+        newX = initialX + (initialWidth - newWidth);
+      }
+      if (resizeHandle.includes('s')) {
+        newHeight = Math.max(50, initialHeight + deltaY);
+      }
+      if (resizeHandle.includes('n')) {
+        newHeight = Math.max(50, initialHeight - deltaY);
+        newY = initialY + (initialHeight - newHeight);
+      }
     }
 
     img.style.width = newWidth + 'px';
