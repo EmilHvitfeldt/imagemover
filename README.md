@@ -1,13 +1,11 @@
-# Imagemover Extension For Quarto
+# Imagemover Extension For Quarto Revealjs
 
-_TODO_: Add a short description of your extension.
+This Revealjs plugin allows the repositioning and resizing of images directly in the previewed slides.
 
 ## Installing
 
-_TODO_: Replace the `<github-organization>` with your GitHub organization.
-
 ```bash
-quarto add <github-organization>/imagemover
+quarto add emilhvitfeldt/quarto-revealjs-imagemover
 ```
 
 This will install the extension under the `_extensions` subdirectory.
@@ -15,7 +13,37 @@ If you're using version control, you will want to check in this directory.
 
 ## Using
 
-_TODO_: Describe how to use your extension.
+Designate the extension as a `revealjs-plugins` in the yaml file.
+
+```yaml
+revealjs-plugins:
+ - imagemover
+```
+
+Next, at the following anywhere in the document.
+Set the `filename` to match the name of the document it is in.
+
+```markdown
+::: {#filename filename=example.qmd}
+:::
+```
+
+To designate that you want to move and resize an image, add the `imagemover` id to the image like so.
+
+```markdown
+![](image.png){#imagemover}
+```
+
+Note that this extension will completely rewrite the `{}`.
+
+Once you have rerendered the slides, each image with the id should be movable and resizable using the corners.
+Holding shift while pulling the corners respects aspect ratios.
+
+Once you are happy with the sizes, open the menu (M), go to tools, and click "Save Moved Images". This will prompt you to save a file. Choose the same folder you are working in to overwrite the document you are in. Rerender, and the images should be locked in place.
+
+## Demo Video
+
+![](demo.mp4)
 
 ## Example
 
