@@ -120,9 +120,16 @@ function setupDraggableImage(img) {
 
   function getClientCoordinates(e) {
     const isTouch = e.type.startsWith('touch');
+
+    // revealjs scales this .slides container element so that
+    // the slide fits completely in the viewport. We have to
+    // adjust the mouse/touch positions by this scaling.
+    const slidesContainerEl = document.querySelector('.slides')
+    const scale =  window.getComputedStyle(slidesContainerEl).getPropertyValue('--slide-scale')
+
     return {
-      clientX: isTouch ? e.touches[0].clientX : e.clientX,
-      clientY: isTouch ? e.touches[0].clientY : e.clientY
+      clientX: (isTouch ? e.touches[0].clientX : e.clientX)/scale,
+      clientY: (isTouch ? e.touches[0].clientY : e.clientY)/scale
     };
   }
 
