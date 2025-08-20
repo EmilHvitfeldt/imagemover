@@ -1,5 +1,9 @@
 # Imagemover Extension For Quarto Revealjs
 
+> [!CAUTION]
+> This extension has been superseded by the [quarto-revealjs-editable](https://github.com/EmilHvitfeldt/quarto-revealjs-editable) extension.
+
+
 This Revealjs plugin allows the repositioning and resizing of images directly in the previewed slides.
 
 ## Installing
